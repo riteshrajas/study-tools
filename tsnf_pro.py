@@ -76,14 +76,14 @@ class TSNFApp:
         ))
         console.print("\n[bold]Welcome![/bold] Let's review some key AP Chemistry concepts.\n")
 
-    def run_quiz(self):
+    def run_quiz(self, practice_mode=False):
         categories = list(self.rules.keys())
         random.shuffle(categories)
 
         total_questions = sum(len(self.rules[c]) for c in categories)
 
         for cat in categories:
-            questions = self.rules[cat]
+            questions = self.rules[cat].copy()
             random.shuffle(questions)
             
             console.print(Panel(f"[bold magenta]{cat}[/bold magenta]", expand=False, border_style="magenta"))
@@ -102,6 +102,33 @@ class TSNFApp:
                     console.print()
                 
                 self.total += 1
+
+        if practice_mode and incorrect_pool:
+            console.print(Panel("[bold yellow]Practice Mode: Reviewing Incorrect Questions[/bold yellow]", expand=False, border_style="yellow"))
+
+            round_num = 2
+            while incorrect_pool:
+                console.print(f"\n[bold underline]Practice Round {round_num}[/bold underline]")
+                next_pool = []
+                random.shuffle(incorrect_pool)
+
+                for i, q_data in enumerate(incorrect_pool):
+                    progress_text = f"[yellow](Practice {i + 1}/{len(incorrect_pool)})[/yellow]"
+                    user_ans = Prompt.ask(f"{progress_text} [white]{q_data['q']}[/white]")
+
+                    if user_ans.lower() == q_data['a'].lower():
+                        console.print("[bold green]✓ Correct![/bold green]\n")
+                    else:
+                        console.print(f"[bold red]✗ Incorrect.[/bold red] Answer: [bold green]{q_data['a']}[/bold green]")
+                        if 'tip' in q_data:
+                            console.print(f"[italic blue]Hint: {q_data['tip']}[/italic blue]")
+                        console.print()
+                        next_pool.append(q_data)
+
+                incorrect_pool = next_pool
+                round_num += 1
+
+            console.print("[bold green]All questions mastered![/bold green]\n")
 
         self.display_summary()
 
@@ -124,4 +151,8 @@ class TSNFApp:
 if __name__ == "__main__":
     app = TSNFApp()
     app.display_welcome()
-    app.run_quiz()
+
+    mode = Prompt.ask("[bold cyan]Choose mode[/bold cyan] (1: Standard Quiz, 2: Practice Mode)", choices=["1", "2"], default="1")
+    is_practice = (mode == "2")
+
+    app.run_quiz(practice_mode=is_practice)
