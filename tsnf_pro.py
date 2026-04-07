@@ -82,12 +82,6 @@ class TSNFApp:
 
         total_questions = sum(len(self.rules[c]) for c in categories)
 
-        # Prepare a flat list of questions so we can track incorrect ones easily
-        # if we want to do it by category, we can keep the category grouping.
-        # Let's do it by category.
-
-        incorrect_pool = []
-
         for cat in categories:
             questions = self.rules[cat].copy()
             random.shuffle(questions)
@@ -106,7 +100,6 @@ class TSNFApp:
                     if 'tip' in q_data:
                         console.print(f"[italic blue]Hint: {q_data['tip']}[/italic blue]")
                     console.print()
-                    incorrect_pool.append(q_data)
                 
                 self.total += 1
 
