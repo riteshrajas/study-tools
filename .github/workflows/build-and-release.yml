@@ -2,8 +2,6 @@ name: Build and Release
 
 on:
   push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write
@@ -24,6 +22,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Generate version
+      id: version
+      run: echo "tag=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -46,6 +49,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ steps.version.outputs.tag }}
         files: dist/${{ matrix.executable_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
