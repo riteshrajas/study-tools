@@ -81,6 +81,7 @@ class TSNFApp:
         random.shuffle(categories)
 
         total_questions = sum(len(self.rules[c]) for c in categories)
+        incorrect_pool = []
 
         for cat in categories:
             questions = self.rules[cat].copy()
@@ -100,6 +101,8 @@ class TSNFApp:
                     if 'tip' in q_data:
                         console.print(f"[italic blue]Hint: {q_data['tip']}[/italic blue]")
                     console.print()
+                    if practice_mode:
+                        incorrect_pool.append(q_data)
                 
                 self.total += 1
 
